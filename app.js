@@ -200,6 +200,9 @@ saveAnalysisButton.addEventListener("click", async () => {
 
     const payload = await response.json().catch(() => ({}));
     if (!response.ok) {
+      if (response.status === 409 && payload.code === "DUPLICATE") {
+        throw new Error("이미 저장된 영상입니다.");
+      }
       throw new Error(payload.error || "저장에 실패했습니다.");
     }
 
@@ -238,9 +241,12 @@ function renderHistory(items) {
   }
 
   items.forEach((item) => {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "history-item";
+    const row = document.createElement("div");
+    row.className = "history-item";
+
+    const openButton = document.createElement("button");
+    openButton.type = "button";
+    openButton.className = "history-main";
 
     const textWrap = document.createElement("div");
 
@@ -257,9 +263,9 @@ function renderHistory(items) {
     open.textContent = "열기";
 
     textWrap.append(title, meta);
-    button.append(textWrap, open);
+    openButton.append(textWrap, open);
 
-    button.addEventListener("click", () => {
+    openButton.addEventListener("click", () => {
       urlInput.value = item.youtube_url || "";
       renderResult(
         {
@@ -275,7 +281,44 @@ function renderHistory(items) {
       setStatus("저장된 분석 기록을 불러왔습니다.", "success");
     });
 
-    historyList.append(button);
+    const deleteButton = document.createElement("button");
+    deleteButton.type = "button";
+    deleteButton.className = "history-delete";
+    deleteButton.textContent = "삭제";
+
+    deleteButton.addEventListener("click", async () => {
+      const confirmed = window.confirm("이 저장 기록을 삭제하시겠습니까?");
+      if (!confirmed) return;
+
+      deleteButton.disabled = true;
+      deleteButton.textContent = "삭제 중";
+
+      try {
+        const response = await fetch("/api/delete", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: item.id })
+        });
+
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(payload.error || "삭제에 실패했습니다.");
+        }
+
+        historyStatus.textContent = "저장 기록이 삭제되었습니다.";
+        historyStatus.className = "status success";
+        await loadHistory();
+      } catch (error) {
+        console.error(error);
+        historyStatus.textContent = error.message || "삭제 중 오류가 발생했습니다.";
+        historyStatus.className = "status error";
+        deleteButton.disabled = false;
+        deleteButton.textContent = "삭제";
+      }
+    });
+
+    row.append(openButton, deleteButton);
+    historyList.append(row);
   });
 }
 
