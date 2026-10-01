@@ -122,7 +122,7 @@ tubenote-ai/
 - Vercel
 
 ## 실행 주소
-Vercel 배포 후 추가합니다.
+https://tubenote-ai.vercel.app
 
 ## 보안
 - `GEMINI_API_KEY`는 Vercel Environment Variables의 Secret으로 관리합니다.
