@@ -40,7 +40,7 @@ Vercel Environment Variables:
 ## 데이터베이스
 Supabase PostgreSQL을 사용합니다.
 
-저장 예정 데이터:
+저장 데이터:
 - id
 - youtube_url
 - video_id
@@ -93,14 +93,16 @@ tubenote-ai/
 ```
 
 ## MVP 범위
-1차 MVP에서는 다음만 완성합니다.
+현재 구현된 기능:
 - 공개 YouTube URL 입력
 - Gemini API 영상 분석
 - 자막형 텍스트 출력
 - 요약 출력
 - 핵심 포인트 출력
+- Supabase 분석 결과 저장
+- Supabase 최근 저장 기록 조회 및 다시 열기
 
-이후 Supabase 저장/조회와 UI 개선을 추가합니다.
+Supabase 테이블은 저장소의 `supabase.sql`을 SQL Editor에서 실행해 생성합니다.
 
 ## 나중에 추가할 기능
 - 실제 동영상 파일 업로드
@@ -126,7 +128,8 @@ https://tubenote-ai.vercel.app
 
 ## 보안
 - `GEMINI_API_KEY`는 Vercel Environment Variables의 Secret으로 관리합니다.
-- Supabase 서버 Secret은 브라우저 코드에 포함하지 않습니다.
+- Supabase 서버 Secret은 브라우저 코드에 포함하지 않고 Vercel Functions에서만 사용합니다.
+- Vercel에는 `SUPABASE_URL`과 `SUPABASE_SECRET_KEY`가 필요합니다.
 - 실제 API Key는 GitHub 및 README에 기록하지 않습니다.
 
 ## 최종 제출
