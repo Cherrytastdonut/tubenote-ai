@@ -10,8 +10,16 @@ const summaryBox = document.getElementById("summary");
 const keyPointsBox = document.getElementById("keyPoints");
 const transcriptBox = document.getElementById("transcript");
 const copyTranscriptButton = document.getElementById("copyTranscript");
+const saveAnalysisButton = document.getElementById("saveAnalysis");
+const saveStatus = document.getElementById("saveStatus");
+const refreshHistoryButton = document.getElementById("refreshHistory");
+const historyStatus = document.getElementById("historyStatus");
+const historyList = document.getElementById("historyList");
 
 let currentTranscript = [];
+let currentAnalysis = null;
+let currentVideoId = null;
+let currentYoutubeUrl = null;
 
 function getVideoId(value) {
   try {
@@ -51,7 +59,14 @@ function setLoading(isLoading) {
   urlInput.disabled = isLoading;
 }
 
-function renderResult(data, videoId) {
+function renderResult(data, videoId, youtubeUrl = canonicalUrl(videoId)) {
+  currentAnalysis = data;
+  currentVideoId = videoId;
+  currentYoutubeUrl = youtubeUrl;
+  saveAnalysisButton.disabled = false;
+  saveStatus.textContent = "";
+  saveStatus.className = "status";
+
   videoFrame.src = `https://www.youtube.com/embed/${videoId}`;
   videoTitle.textContent = data.title || "제목을 확인하지 못했습니다.";
   videoLanguage.textContent = data.original_language
@@ -130,7 +145,7 @@ form.addEventListener("submit", async (event) => {
       throw new Error(payload.error || "영상 분석에 실패했습니다.");
     }
 
-    renderResult(payload.data, videoId);
+    renderResult(payload.data, videoId, youtubeUrl);
     setStatus("분석이 완료되었습니다.", "success");
   } catch (error) {
     console.error(error);
@@ -157,3 +172,133 @@ copyTranscriptButton.addEventListener("click", async () => {
     setStatus("브라우저에서 복사 기능을 사용할 수 없습니다.", "error");
   }
 });
+
+
+saveAnalysisButton.disabled = true;
+
+saveAnalysisButton.addEventListener("click", async () => {
+  if (!currentAnalysis || !currentVideoId || !currentYoutubeUrl) {
+    saveStatus.textContent = "먼저 영상을 분석해 주세요.";
+    saveStatus.className = "status error";
+    return;
+  }
+
+  saveAnalysisButton.disabled = true;
+  saveStatus.textContent = "Supabase에 저장 중입니다...";
+  saveStatus.className = "status";
+
+  try {
+    const response = await fetch("/api/save", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        videoId: currentVideoId,
+        youtubeUrl: currentYoutubeUrl,
+        data: currentAnalysis
+      })
+    });
+
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(payload.error || "저장에 실패했습니다.");
+    }
+
+    saveStatus.textContent = "Supabase에 저장되었습니다.";
+    saveStatus.className = "status success";
+    await loadHistory();
+  } catch (error) {
+    console.error(error);
+    saveStatus.textContent = error.message || "저장 중 오류가 발생했습니다.";
+    saveStatus.className = "status error";
+  } finally {
+    saveAnalysisButton.disabled = false;
+  }
+});
+
+function formatDate(value) {
+  try {
+    return new Intl.DateTimeFormat("ko-KR", {
+      dateStyle: "medium",
+      timeStyle: "short"
+    }).format(new Date(value));
+  } catch {
+    return "";
+  }
+}
+
+function renderHistory(items) {
+  historyList.replaceChildren();
+
+  if (!items.length) {
+    const empty = document.createElement("p");
+    empty.className = "muted";
+    empty.textContent = "아직 저장된 분석 기록이 없습니다.";
+    historyList.append(empty);
+    return;
+  }
+
+  items.forEach((item) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "history-item";
+
+    const textWrap = document.createElement("div");
+
+    const title = document.createElement("p");
+    title.className = "history-title";
+    title.textContent = item.title || "제목 없음";
+
+    const meta = document.createElement("p");
+    meta.className = "history-meta";
+    meta.textContent = `${formatDate(item.created_at)} · ${item.original_language || "언어 미상"}`;
+
+    const open = document.createElement("span");
+    open.className = "history-open";
+    open.textContent = "열기";
+
+    textWrap.append(title, meta);
+    button.append(textWrap, open);
+
+    button.addEventListener("click", () => {
+      urlInput.value = item.youtube_url || "";
+      renderResult(
+        {
+          title: item.title,
+          original_language: item.original_language,
+          summary: item.summary,
+          key_points: item.key_points,
+          transcript: item.transcript
+        },
+        item.video_id,
+        item.youtube_url
+      );
+      setStatus("저장된 분석 기록을 불러왔습니다.", "success");
+    });
+
+    historyList.append(button);
+  });
+}
+
+async function loadHistory() {
+  historyStatus.textContent = "저장 기록을 불러오는 중입니다...";
+  historyStatus.className = "status";
+
+  try {
+    const response = await fetch("/api/history");
+    const payload = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      throw new Error(payload.error || "저장 기록을 불러오지 못했습니다.");
+    }
+
+    renderHistory(Array.isArray(payload.data) ? payload.data : []);
+    historyStatus.textContent = "";
+  } catch (error) {
+    console.error(error);
+    historyStatus.textContent = error.message || "저장 기록 조회 중 오류가 발생했습니다.";
+    historyStatus.className = "status error";
+  }
+}
+
+refreshHistoryButton.addEventListener("click", loadHistory);
+loadHistory();
