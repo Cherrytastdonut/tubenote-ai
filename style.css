@@ -314,6 +314,14 @@ footer {
   width: 100%;
   display: grid;
   grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.history-main {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto;
   gap: 12px;
   align-items: center;
   padding: 15px 16px;
@@ -324,8 +332,26 @@ footer {
   text-align: left;
 }
 
-.history-item:hover {
+.history-main:hover {
   border-color: #4b5370;
+}
+
+.history-delete {
+  padding: 0 14px;
+  border: 1px solid #5a2f3b;
+  border-radius: 14px;
+  background: rgba(255, 84, 112, .08);
+  color: #ff8ba8;
+  font-weight: 800;
+}
+
+.history-delete:hover {
+  background: rgba(255, 84, 112, .14);
+}
+
+.history-delete:disabled {
+  cursor: wait;
+  opacity: .6;
 }
 
 .history-title {
@@ -348,4 +374,5 @@ footer {
 
 @media (max-width: 720px) {
   .history-item { grid-template-columns: 1fr; }
+  .history-delete { min-height: 44px; }
 }
