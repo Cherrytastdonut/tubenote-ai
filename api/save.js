@@ -16,6 +16,14 @@ function validVideoId(value) {
   return typeof value === "string" && /^[A-Za-z0-9_-]{11}$/.test(value);
 }
 
+function supabaseHeaders(key, extra = {}) {
+  return {
+    "apikey": key,
+    "Authorization": `Bearer ${key}`,
+    ...extra
+  };
+}
+
 module.exports = async function handler(req, res) {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
@@ -52,14 +60,41 @@ module.exports = async function handler(req, res) {
   try {
     const { url, key } = getSupabaseConfig();
 
+    // 같은 YouTube 영상이 이미 저장되어 있는지 먼저 확인합니다.
+    const checkParams = new URLSearchParams({
+      select: "id,title,created_at",
+      video_id: `eq.${videoId}`,
+      limit: "1"
+    });
+
+    const checkResponse = await fetch(
+      `${url}/rest/v1/video_analyses?${checkParams.toString()}`,
+      { headers: supabaseHeaders(key) }
+    );
+
+    const existing = await checkResponse.json().catch(() => null);
+
+    if (!checkResponse.ok) {
+      console.error("Supabase duplicate check error:", existing);
+      return res.status(502).json({
+        error: existing?.message || "중복 저장 여부를 확인하지 못했습니다."
+      });
+    }
+
+    if (Array.isArray(existing) && existing.length > 0) {
+      return res.status(409).json({
+        code: "DUPLICATE",
+        error: "이미 저장된 영상입니다.",
+        existing: existing[0]
+      });
+    }
+
     const response = await fetch(`${url}/rest/v1/video_analyses`, {
       method: "POST",
-      headers: {
+      headers: supabaseHeaders(key, {
         "Content-Type": "application/json",
-        "apikey": key,
-        "Authorization": `Bearer ${key}`,
         "Prefer": "return=representation"
-      },
+      }),
       body: JSON.stringify(record)
     });
 
@@ -67,6 +102,15 @@ module.exports = async function handler(req, res) {
 
     if (!response.ok) {
       console.error("Supabase save error:", payload);
+
+      // UNIQUE 인덱스가 동시에 발생한 중복 저장도 최종적으로 차단합니다.
+      if (payload?.code === "23505") {
+        return res.status(409).json({
+          code: "DUPLICATE",
+          error: "이미 저장된 영상입니다."
+        });
+      }
+
       return res.status(502).json({
         error: payload?.message || "Supabase에 분석 결과를 저장하지 못했습니다."
       });
