@@ -22,7 +22,9 @@ YouTube 공개 영상 URL을 입력하면 Google Gemini API가 영상 내용을 
 - 핵심 요약 생성
 - 핵심 포인트 생성
 - Supabase 결과 저장
+- 동일 YouTube 영상 중복 저장 방지
 - 이전 분석 기록 조회
+- 저장 기록 삭제
 
 ## Google API
 ### Google Gemini API
@@ -76,6 +78,7 @@ Supabase PostgreSQL을 사용합니다.
 - `/api/analyze.js`: YouTube URL 검증 + Gemini 분석
 - `/api/save.js`: 분석 결과 Supabase 저장
 - `/api/history.js`: 저장된 결과 조회
+- `/api/delete.js`: 저장된 결과 삭제
 
 ## 기본 파일 구조
 ```
@@ -89,7 +92,8 @@ tubenote-ai/
 └─ api/
    ├─ analyze.js
    ├─ save.js
-   └─ history.js
+   ├─ history.js
+   └─ delete.js
 ```
 
 ## MVP 범위
@@ -101,6 +105,8 @@ tubenote-ai/
 - 핵심 포인트 출력
 - Supabase 분석 결과 저장
 - Supabase 최근 저장 기록 조회 및 다시 열기
+- 동일 영상 중복 저장 방지
+- 저장 기록 삭제
 
 Supabase 테이블은 저장소의 `supabase.sql`을 SQL Editor에서 실행해 생성합니다.
 
