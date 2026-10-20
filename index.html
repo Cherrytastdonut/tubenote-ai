@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="YouTube 영상을 Gemini가 분석해 자막형 텍스트와 핵심 요약을 생성하는 TubeNote AI" />
+  <meta name="description" content="YouTube 영상을 AI 마인드맵, 핵심 요약, 용어 설명으로 정리하는 TubeNote AI" />
   <title>TubeNote AI</title>
-  <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" href="/style.css?v=2" />
 </head>
 <body>
   <main class="shell">
@@ -15,7 +15,7 @@
       <h1>긴 영상도 링크 하나로<br />빠르게 정리하세요.</h1>
       <p class="hero-copy">
         공개 YouTube 영상 URL을 입력하면 Google Gemini가 영상을 분석해
-        핵심 요약, 포인트, 자막형 텍스트를 만들어 드립니다.
+        핵심 요약, 마인드맵, 낯선 용어의 설명을 만들어 드립니다.
       </p>
     </header>
 
@@ -72,6 +72,7 @@
       <div class="panel">
         <p class="step">SUMMARY</p>
         <h2>핵심 요약</h2>
+        <p class="hint">밑줄 친 용어에 마우스를 올리거나 누르면 설명이 열립니다.</p>
         <p id="summary" class="summary-text"></p>
       </div>
 
@@ -81,6 +82,25 @@
         <p class="hint">시간을 누르면 해당 시점의 YouTube 영상이 새 탭에서 열립니다.</p>
         <div id="keyPoints" class="point-list"></div>
       </div>
+
+      <section class="panel mindmap-panel" aria-labelledby="mindMapTitle">
+        <p class="step">MIND MAP</p>
+        <h2 id="mindMapTitle">AI 분석 마인드맵</h2>
+        <p id="mindMapStatus" class="hint"></p>
+        <div id="mindMap" class="mind-map" role="group" aria-label="영상 개념 마인드맵"></div>
+      </section>
+
+      <section class="panel wiki-panel" aria-labelledby="wikiTitle">
+        <div class="section-heading">
+          <div>
+            <p class="step">EXPLORE MORE</p>
+            <h2 id="wikiTitle">함께 읽으면 좋은 위키피디아</h2>
+          </div>
+          <button id="wikiRetry" type="button" class="secondary-button hidden">다시 찾기</button>
+        </div>
+        <p id="wikiStatus" class="hint" role="status" aria-live="polite"></p>
+        <div id="wikiLinks" class="wiki-grid"></div>
+      </section>
 
       <div class="panel save-panel">
         <div class="section-heading">
@@ -93,19 +113,6 @@
         <p id="saveStatus" class="status" role="status" aria-live="polite"></p>
       </div>
 
-      <div class="panel">
-        <div class="section-heading">
-          <div>
-            <p class="step">TRANSCRIPT</p>
-            <h2>AI 자막형 텍스트</h2>
-          </div>
-          <button id="copyTranscript" type="button" class="secondary-button">복사</button>
-        </div>
-        <p class="notice">
-          Gemini가 영상의 음성을 바탕으로 생성한 자막형 기록입니다. YouTube의 공식 자막 원문과 다를 수 있습니다.
-        </p>
-        <div id="transcript" class="transcript"></div>
-      </div>
     </section>
 
     <section class="panel history-panel" aria-labelledby="history-title">
@@ -125,6 +132,11 @@
     </footer>
   </main>
 
-  <script src="/app.js" defer></script>
+  <div id="learningTooltip" class="learning-tooltip" role="tooltip" hidden>
+    <strong id="tooltipTitle"></strong>
+    <p id="tooltipText"></p>
+  </div>
+  <script src="/learning.js?v=2" defer></script>
+  <script src="/app.js?v=2" defer></script>
 </body>
 </html>

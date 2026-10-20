@@ -12,6 +12,8 @@ create table if not exists public.video_analyses (
   original_language text not null default '',
   summary text not null default '',
   key_points jsonb not null default '[]'::jsonb,
+  -- v1: 자막 배열 / v2: {version: 2, mind_map, glossary, wiki_topics, wiki_links, ...}
+  -- 기존 JSONB 컬럼을 재사용하므로 학습 노트 기능에 별도 마이그레이션은 필요하지 않습니다.
   transcript jsonb not null default '[]'::jsonb,
   created_at timestamptz not null default now()
 );

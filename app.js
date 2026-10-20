@@ -8,15 +8,12 @@ const videoTitle = document.getElementById("videoTitle");
 const videoLanguage = document.getElementById("videoLanguage");
 const summaryBox = document.getElementById("summary");
 const keyPointsBox = document.getElementById("keyPoints");
-const transcriptBox = document.getElementById("transcript");
-const copyTranscriptButton = document.getElementById("copyTranscript");
 const saveAnalysisButton = document.getElementById("saveAnalysis");
 const saveStatus = document.getElementById("saveStatus");
 const refreshHistoryButton = document.getElementById("refreshHistory");
 const historyStatus = document.getElementById("historyStatus");
 const historyList = document.getElementById("historyList");
 
-let currentTranscript = [];
 let currentAnalysis = null;
 let currentVideoId = null;
 let currentYoutubeUrl = null;
@@ -74,6 +71,7 @@ function setLoading(isLoading) {
 
 function renderResult(data, videoId, youtubeUrl = canonicalUrl(videoId)) {
   currentAnalysis = data;
+  window.TubeNoteLearning.prepare(data);
   currentVideoId = videoId;
   currentYoutubeUrl = youtubeUrl;
   saveAnalysisButton.disabled = false;
@@ -85,7 +83,7 @@ function renderResult(data, videoId, youtubeUrl = canonicalUrl(videoId)) {
   videoLanguage.textContent = data.original_language
     ? `감지 언어: ${data.original_language}`
     : "";
-  summaryBox.textContent = data.summary || "요약 결과가 없습니다.";
+  window.TubeNoteLearning.renderText(summaryBox, data.summary || "요약 결과가 없습니다.");
 
   keyPointsBox.replaceChildren();
   const points = Array.isArray(data.key_points) ? data.key_points : [];
@@ -108,37 +106,14 @@ function renderResult(data, videoId, youtubeUrl = canonicalUrl(videoId)) {
     }
 
     const text = document.createElement("p");
-    text.textContent = item.point || "";
+    window.TubeNoteLearning.renderText(text, item.point || "");
 
     row.append(time, text);
     keyPointsBox.append(row);
   });
 
-  transcriptBox.replaceChildren();
-  currentTranscript = Array.isArray(data.transcript) ? data.transcript : [];
-  currentTranscript.forEach((item) => {
-    const row = document.createElement("div");
-    row.className = "transcript-line";
-
-    const time = document.createElement("span");
-    time.className = "timestamp";
-    time.textContent = item.timestamp || "--:--";
-
-    const text = document.createElement("p");
-    text.textContent = item.text || "";
-
-    row.append(time, text);
-    transcriptBox.append(row);
-  });
-
-  if (!currentTranscript.length) {
-    const empty = document.createElement("p");
-    empty.className = "muted";
-    empty.textContent = "음성 자막형 텍스트를 생성하지 못했습니다.";
-    transcriptBox.append(empty);
-  }
-
   resultSection.classList.remove("hidden");
+  window.TubeNoteLearning.renderExtras(data);
   resultSection.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
@@ -177,25 +152,6 @@ form.addEventListener("submit", async (event) => {
     setLoading(false);
   }
 });
-
-copyTranscriptButton.addEventListener("click", async () => {
-  if (!currentTranscript.length) return;
-
-  const text = currentTranscript
-    .map((item) => `[${item.timestamp || "--:--"}] ${item.text || ""}`)
-    .join("\n");
-
-  try {
-    await navigator.clipboard.writeText(text);
-    copyTranscriptButton.textContent = "복사됨";
-    setTimeout(() => {
-      copyTranscriptButton.textContent = "복사";
-    }, 1400);
-  } catch {
-    setStatus("브라우저에서 복사 기능을 사용할 수 없습니다.", "error");
-  }
-});
-
 
 saveAnalysisButton.disabled = true;
 
@@ -290,17 +246,7 @@ function renderHistory(items) {
 
     openButton.addEventListener("click", () => {
       urlInput.value = item.youtube_url || "";
-      renderResult(
-        {
-          title: item.title,
-          original_language: item.original_language,
-          summary: item.summary,
-          key_points: item.key_points,
-          transcript: item.transcript
-        },
-        item.video_id,
-        item.youtube_url
-      );
+      renderResult(item, item.video_id, item.youtube_url);
       setStatus("저장된 분석 기록을 불러왔습니다.", "success");
     });
 

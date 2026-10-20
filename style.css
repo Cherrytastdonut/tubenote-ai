@@ -260,29 +260,13 @@ button.loading .button-spinner { display: block; }
   outline-offset: 3px;
 }
 
-.point p, .transcript-line p { margin: 0; line-height: 1.7; }
+.point p { margin: 0; line-height: 1.7; }
 
 .notice {
   margin: 14px 0 18px;
   padding: 12px 14px;
   border-radius: 12px;
   background: #0b0f18;
-}
-
-.transcript {
-  display: grid;
-  gap: 2px;
-  max-height: 620px;
-  overflow: auto;
-  padding-right: 6px;
-}
-
-.transcript-line {
-  display: grid;
-  grid-template-columns: 82px 1fr;
-  gap: 14px;
-  padding: 13px 8px;
-  border-bottom: 1px solid #202637;
 }
 
 .secondary-button {
@@ -306,7 +290,6 @@ footer {
   button[type="submit"] { min-height: 52px; }
   .video-card { grid-template-columns: 1fr; }
   .point { grid-template-columns: 64px 1fr; }
-  .transcript-line { grid-template-columns: 68px 1fr; }
 }
 
 
@@ -399,4 +382,131 @@ footer {
 @media (max-width: 720px) {
   .history-item { grid-template-columns: 1fr; }
   .history-delete { min-height: 44px; }
+}
+
+/* Contextual explanations: hover, keyboard focus and touch. */
+.glossary-term {
+  display: inline;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: #c6bdff;
+  font: inherit;
+  line-height: inherit;
+  text-align: inherit;
+  text-decoration: underline dotted #a99bff;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1.5px;
+}
+.glossary-term:hover { color: #eeeaff; background: rgba(121, 105, 255, .14); }
+.glossary-term:focus-visible, .mind-node:focus-visible, .wiki-card:focus-visible {
+  outline: 2px solid #c0b7ff;
+  outline-offset: 4px;
+}
+.learning-tooltip {
+  position: fixed;
+  z-index: 100;
+  width: 330px;
+  max-width: calc(100vw - 24px);
+  max-height: min(360px, calc(100dvh - 24px));
+  overflow: auto;
+  padding: 17px 19px;
+  border: 1px solid #62598a;
+  border-radius: 15px;
+  background: #202235;
+  color: #e3e5f0;
+  box-shadow: 0 12px 38px rgba(0, 0, 0, .45);
+  font-size: 14px;
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+}
+.learning-tooltip[hidden] { display: none; }
+.learning-tooltip strong { display: block; color: #c6bdff; font-size: 15px; }
+.learning-tooltip p { margin: 8px 0 0; white-space: pre-wrap; }
+
+/* A real three-level map; paths follow node geometry after resizing. */
+.mind-map {
+  overflow: auto;
+  max-height: 680px;
+  margin-top: 18px;
+  border: 1px solid #2a3044;
+  border-radius: 18px;
+  background: radial-gradient(circle at 1px 1px, #282d40 1px, transparent 0) 0 0 / 20px 20px, #0b0f18;
+  scrollbar-color: #554d7d #10141f;
+}
+.mind-canvas {
+  position: relative;
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr);
+  gap: 40px;
+  min-width: 670px;
+  padding: 28px 18px;
+}
+.mind-lines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: visible;
+  fill: none;
+  stroke-width: 1.8;
+  opacity: .65;
+}
+.mind-root-wrap { display: flex; align-items: center; }
+.mind-branches { display: grid; gap: 28px; }
+.mind-branch {
+  display: grid;
+  grid-template-columns: 160px minmax(150px, 1fr);
+  gap: 40px;
+  align-items: center;
+}
+.mind-leaves { display: grid; gap: 12px; }
+.mind-node {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  min-height: 48px;
+  padding: 13px 14px;
+  border: 1px solid var(--branch-color, #a89bff);
+  border-radius: 13px;
+  background: #171c2b;
+  color: #e9eaf4;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+  text-align: left;
+  transition: background .15s, box-shadow .15s;
+}
+.mind-node:hover { background: #242b40; box-shadow: 0 0 0 3px rgba(168, 155, 255, .12); }
+.mind-root { background: #51438c; border-color: #b4a4ff; color: #fff; font-size: 16px; text-align: center; }
+.mind-root:hover { background: #6251a4; }
+.mind-topic { color: var(--branch-color); }
+.mind-leaf { border-color: #394156; font-weight: 500; }
+
+.wiki-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.wiki-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px;
+  border: 1px solid #2c3448;
+  border-radius: 16px;
+  background: #0b0f18;
+  color: #eff0f7;
+  text-decoration: none;
+  transition: border-color .15s, background .15s;
+}
+.wiki-card:hover { border-color: #8d7dda; background: #151a2a; }
+.wiki-source { color: #9b90ff; font-size: 10px; font-weight: 800; letter-spacing: .08em; }
+.wiki-card strong { font-size: 17px; line-height: 1.5; }
+.wiki-card p { margin: 0; color: #acb4c6; font-size: 13px; line-height: 1.75; }
+.wiki-open { margin-top: auto; padding-top: 6px; font-size: 12px; font-weight: 700; color: #c6bdff; }
+@media (max-width: 720px) {
+  .wiki-grid { grid-template-columns: 1fr; }
+  .mind-map { max-height: 580px; }
+  .mindmap-panel, .wiki-panel { min-width: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mind-node, .wiki-card { transition: none; }
 }

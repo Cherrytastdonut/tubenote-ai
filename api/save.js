@@ -1,3 +1,5 @@
+const { packAnalysisExtras } = require("../lib/analysis");
+
 function getSupabaseConfig() {
   const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -54,7 +56,7 @@ module.exports = async function handler(req, res) {
     original_language: String(data.original_language || "").slice(0, 100),
     summary: String(data.summary || ""),
     key_points: Array.isArray(data.key_points) ? data.key_points : [],
-    transcript: Array.isArray(data.transcript) ? data.transcript : []
+    transcript: packAnalysisExtras(data)
   };
 
   try {

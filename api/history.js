@@ -1,3 +1,5 @@
+const { unpackAnalysisRecord } = require("../lib/analysis");
+
 function getSupabaseConfig() {
   const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -47,7 +49,7 @@ module.exports = async function handler(req, res) {
     }
 
     return res.status(200).json({
-      data: Array.isArray(payload) ? payload : []
+      data: Array.isArray(payload) ? payload.map(unpackAnalysisRecord) : []
     });
   } catch (error) {
     console.error("History API error:", error);
