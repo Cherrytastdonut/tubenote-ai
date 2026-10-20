@@ -48,6 +48,19 @@ function canonicalUrl(videoId) {
   return `https://www.youtube.com/watch?v=${videoId}`;
 }
 
+function timestampToSeconds(value) {
+  if (typeof value !== "string") return null;
+
+  const timestamp = value.trim();
+  if (!/^(?:\d+:)?\d+:[0-5]\d$/.test(timestamp)) return null;
+
+  const parts = timestamp.split(":").map(Number);
+  if (parts.length === 3 && parts[1] >= 60) return null;
+
+  const seconds = parts.reduce((total, part) => total * 60 + part, 0);
+  return Number.isSafeInteger(seconds) ? seconds : null;
+}
+
 function setStatus(message, type = "") {
   statusBox.textContent = message;
   statusBox.className = `status ${type}`.trim();
@@ -80,9 +93,19 @@ function renderResult(data, videoId, youtubeUrl = canonicalUrl(videoId)) {
     const row = document.createElement("div");
     row.className = "point";
 
-    const time = document.createElement("span");
+    const seconds = timestampToSeconds(item.timestamp);
+    const time = document.createElement(seconds === null ? "span" : "a");
     time.className = "timestamp";
     time.textContent = item.timestamp || "--:--";
+
+    if (seconds !== null) {
+      time.classList.add("timestamp-link");
+      time.href = `${canonicalUrl(videoId)}&t=${seconds}s`;
+      time.target = "_blank";
+      time.rel = "noopener noreferrer";
+      time.title = `${item.timestamp}부터 YouTube 영상 보기 (새 탭)`;
+      time.setAttribute("aria-label", time.title);
+    }
 
     const text = document.createElement("p");
     text.textContent = item.point || "";
