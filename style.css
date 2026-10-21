@@ -510,3 +510,100 @@ footer {
 @media (prefers-reduced-motion: reduce) {
   .mind-node, .wiki-card { transition: none; }
 }
+
+
+/* Concept explanations: native dialog supplies focus containment and Escape. */
+.concept-dialog {
+  width: min(760px, calc(100vw - 32px));
+  max-width: none;
+  max-height: calc(100dvh - 36px);
+  margin: auto 18px auto auto;
+  padding: 0;
+  border: 1px solid #484261;
+  border-radius: 22px;
+  color: #e9eaf4;
+  background: #111624;
+  box-shadow: 0 24px 100px rgba(0, 0, 0, .55);
+  scrollbar-color: #554d7d #111624;
+}
+.concept-dialog::backdrop { background: rgba(3, 6, 13, .72); }
+body:has(.concept-dialog[open]) { overflow: hidden; }
+.concept-dialog [hidden] { display: none !important; }
+.explain-shell { padding: 28px; overflow-wrap: anywhere; }
+.explain-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.explain-heading .step { margin-top: 0; }
+.explain-heading h2 { line-height: 1.5; font-size: 25px; margin: 8px 0 18px; }
+.explain-heading h2:focus { outline: none; }
+.explain-close {
+  flex: 0 0 44px; width: 44px; height: 44px; padding: 0; border-radius: 50%;
+  border: 1px solid #3a4258; background: #1c2233; color: #e9eaf4; font-size: 27px;
+}
+.explain-close:hover { background: #32304d; }
+.explain-context { border: 1px solid #30374b; border-radius: 12px; padding: 12px 15px; color: #b5bdcf; }
+.explain-context summary { cursor: pointer; font-size: 13px; color: #ccc6ee; min-height: 24px; }
+.explain-context p { margin: 12px 0 0; font-size: 14px; line-height: 1.8; }
+.explain-overview { margin: 18px 0; font-size: 17px; line-height: 1.85; }
+.explain-recommendation { color: #bfb1ff; font-size: 13px; line-height: 1.7; }
+.explain-tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; margin: 20px 0; }
+.explain-tabs button {
+  min-height: 52px; padding: 11px 7px; border: 1px solid #343b51; border-radius: 12px;
+  background: #0c111c; color: #b9c0d2; font-weight: 700; font-size: 14px;
+}
+.explain-tabs button[aria-selected="true"] { border-color: #a99bff; background: #392f5e; color: #f5f1ff; }
+.explain-tabs button:hover { border-color: #9583d3; }
+.explain-badge {
+  display: inline-block; margin-left: 5px; padding: 2px 5px; border-radius: 5px;
+  background: #51438c; color: #eee8ff; font-size: 10px; vertical-align: middle;
+}
+.explain-mode { line-height: 1.85; font-size: 15px; }
+.explain-mode h3 { font-size: 18px; margin: 0 0 14px; color: #f1edff; }
+.explain-mode p { white-space: pre-wrap; }
+.explain-story { padding: 20px; border: 1px solid #34334e; border-radius: 15px; background: #1b1d31; }
+.explain-story p { margin: 0; }
+.explain-table-wrap { margin: 20px 0; overflow-x: auto; border: 1px solid #333c51; border-radius: 13px; }
+.explain-table { width: 100%; border-collapse: collapse; font-size: 14px; table-layout: fixed; }
+.explain-table caption { padding: 12px 15px; font-weight: 700; text-align: left; color: #c9bfff; background: #1a2031; }
+.explain-table th, .explain-table td { padding: 12px 14px; border-bottom: 1px solid #30374a; text-align: left; vertical-align: top; }
+.explain-table thead { background: #1b2333; color: #c9d4eb; }
+.explain-table tbody th { color: #b6a5ed; font-weight: 600; }
+.explain-table tbody tr:last-child > * { border-bottom: 0; }
+.explain-callout { margin-top: 18px; padding: 16px 18px; border-left: 3px solid #aa93ee; border-radius: 0 12px 12px 0; background: #1c2133; }
+.explain-callout strong { display: block; font-size: 13px; color: #c6b5f6; }
+.explain-callout p { margin: 7px 0 0; }
+.explain-steps { display: flex; gap: 8px; margin: 18px 0; }
+.explain-steps button {
+  min-width: 42px; min-height: 42px; padding: 6px 12px; border: 1px solid #414963;
+  border-radius: 10px; background: #181d2d; color: #b8c0d4; font-weight: 800;
+}
+.explain-steps button[aria-current="step"] { color: #fff; background: #6554ae; border-color: #bbacff; }
+.explain-step-card { min-height: 220px; padding: 22px; border: 1px solid #455370; border-radius: 16px; background: #121c2e; }
+.explain-step-card h4 { margin: 0 0 12px; font-size: 18px; color: #9fc8ff; }
+.explain-step-card p { margin: 0 0 12px; }
+.explain-step-why { font-size: 14px; color: #bcc9e2; }
+.explain-step-why strong { color: #89b8f2; }
+.explain-step-controls { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 16px; }
+.explain-step-controls button { min-height: 44px; }
+.explain-step-controls button:disabled { opacity: .4; cursor: default; }
+.explain-step-count { color: #a7b2ca; font-size: 13px; }
+.concept-dialog button:focus-visible, .explain-mode:focus-visible, .explain-context summary:focus-visible {
+  outline: 2px solid #c5b8ff; outline-offset: 3px;
+}
+#conceptStatus[data-loading="true"]::before {
+  content: ""; display: inline-block; width: 14px; height: 14px; margin-right: 9px;
+  border: 2px solid #443c69; border-top-color: #b3a1ff; border-radius: 50%; vertical-align: -3px;
+  animation: spin .9s linear infinite;
+}
+@media (max-width: 720px) {
+  .concept-dialog { width: calc(100vw - 16px); max-height: calc(100dvh - 16px); margin: auto; border-radius: 18px; }
+  .explain-shell { padding: 20px 16px; }
+  .explain-heading h2 { font-size: 21px; }
+  .explain-tabs { gap: 5px; }
+  .explain-tabs button { font-size: 12px; }
+  .explain-badge { display: block; width: fit-content; margin: 4px auto 0; }
+  .explain-table th, .explain-table td { padding: 10px 8px; }
+  .explain-table { font-size: 12px; }
+  .explain-story, .explain-step-card { padding: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #conceptStatus[data-loading="true"]::before { animation: none; }
+}

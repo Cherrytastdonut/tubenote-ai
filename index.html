@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="YouTube 영상을 AI 마인드맵, 핵심 요약, 용어 설명으로 정리하는 TubeNote AI" />
   <title>TubeNote AI</title>
-  <link rel="stylesheet" href="/style.css?v=2" />
+  <link rel="stylesheet" href="/style.css?v=3" />
 </head>
 <body>
   <main class="shell">
@@ -136,7 +136,39 @@
     <strong id="tooltipTitle"></strong>
     <p id="tooltipText"></p>
   </div>
-  <script src="/learning.js?v=2" defer></script>
-  <script src="/app.js?v=2" defer></script>
+
+  <dialog id="conceptDialog" class="concept-dialog" aria-labelledby="conceptTitle" aria-describedby="conceptSource">
+    <div class="explain-shell">
+      <div class="explain-heading">
+        <div>
+          <p class="step">CONCEPT GUIDE</p>
+          <h2 id="conceptTitle" tabindex="-1" autofocus>개념 이해하기</h2>
+        </div>
+        <button id="conceptClose" type="button" class="explain-close" aria-label="개념 설명 닫기">×</button>
+      </div>
+      <details class="explain-context">
+        <summary>영상에서 다룬 내용</summary>
+        <p id="conceptContext"></p>
+      </details>
+      <p id="conceptSource" class="hint">영상 분석을 바탕으로 만든 AI 보충 설명입니다. 비유와 가상 예시는 이해를 돕기 위한 구성입니다.</p>
+      <p id="conceptStatus" class="status" role="status" aria-live="polite"></p>
+      <button id="conceptRetry" type="button" class="secondary-button" hidden>설명 다시 만들기</button>
+      <div id="conceptBody" hidden>
+        <p id="conceptOverview" class="explain-overview"></p>
+        <p id="conceptRecommendation" class="explain-recommendation"></p>
+        <div id="conceptTabs" class="explain-tabs" role="tablist" aria-label="개념 설명 방식">
+          <button id="tab-analogy" type="button" role="tab" aria-selected="true" aria-controls="panel-analogy" data-mode="analogy">비유로 이해</button>
+          <button id="tab-example" type="button" role="tab" aria-selected="false" aria-controls="panel-example" data-mode="example" tabindex="-1">예시 따라가기</button>
+          <button id="tab-comparison" type="button" role="tab" aria-selected="false" aria-controls="panel-comparison" data-mode="comparison" tabindex="-1">나란히 비교</button>
+        </div>
+        <section id="panel-analogy" class="explain-mode" role="tabpanel" aria-labelledby="tab-analogy" tabindex="0"></section>
+        <section id="panel-example" class="explain-mode" role="tabpanel" aria-labelledby="tab-example" tabindex="0" hidden></section>
+        <section id="panel-comparison" class="explain-mode" role="tabpanel" aria-labelledby="tab-comparison" tabindex="0" hidden></section>
+      </div>
+    </div>
+  </dialog>
+  <script src="/explanations.js?v=3" defer></script>
+  <script src="/learning.js?v=3" defer></script>
+  <script src="/app.js?v=3" defer></script>
 </body>
 </html>

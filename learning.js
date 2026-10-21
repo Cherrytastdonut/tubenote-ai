@@ -69,13 +69,13 @@
     }, 160);
   }
 
-  function explain(element, title, description, placement = "above") {
+  function explain(element, title, description, placement = "above", openOnClick = true) {
     const open = () => showTooltip(element, title, description, placement);
     element.addEventListener("mouseenter", open);
     element.addEventListener("mouseleave", scheduleHide);
     element.addEventListener("focus", open);
     element.addEventListener("blur", scheduleHide);
-    element.addEventListener("click", open);
+    if (openOnClick) element.addEventListener("click", open);
   }
 
   tooltip.addEventListener("mouseenter", () => clearTimeout(hideTimer));
@@ -90,6 +90,7 @@
   window.addEventListener("scroll", positionTooltip, true);
 
   function prepare(data) {
+    window.TubeNoteExplainer.prepare(data);
     renderVersion += 1;
     if (wikiController) wikiController.abort();
     hideTooltip();
@@ -135,8 +136,14 @@
     node.type = "button";
     node.className = "mind-node " + className;
     node.textContent = item.title;
-    node.setAttribute("aria-label", item.title + " 설명 보기");
-    explain(node, item.title, item.description || "추가 설명이 없습니다.", "side");
+    node.setAttribute("aria-label", item.title + " 자세히 이해하기");
+    node.setAttribute("aria-haspopup", "dialog");
+    node.setAttribute("aria-controls", "conceptDialog");
+    explain(node, item.title, item.description || "추가 설명이 없습니다.", "side", false);
+    node.addEventListener("click", () => {
+      hideTooltip();
+      window.TubeNoteExplainer.open(item);
+    });
     return node;
   }
 
@@ -151,8 +158,8 @@
       return;
     }
     mindMapStatus.textContent = data.analysis_version === 1 || data.mind_map_source === "key_points"
-      ? "이전 요약과 핵심 포인트로 구성한 지도입니다. 다시 분석하면 세부 개념과 용어 설명이 추가됩니다."
-      : "항목에 마우스를 올리거나 누르면 설명이 열립니다. 키보드 Tab으로도 확인할 수 있습니다.";
+      ? "이전 요약으로 구성한 지도입니다. 항목을 누르면 비유·예시·비교 설명을 볼 수 있습니다. 다시 분석하면 세부 개념이 추가됩니다."
+      : "마우스를 올리면 짧은 설명, 클릭하면 비유·예시·비교 설명이 열립니다. 모바일 터치와 키보드 Tab/Enter도 지원합니다.";
     const canvas = document.createElement("div");
     canvas.className = "mind-canvas";
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");

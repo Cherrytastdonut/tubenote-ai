@@ -128,6 +128,7 @@ form.addEventListener("submit", async (event) => {
 
   const youtubeUrl = canonicalUrl(videoId);
   setLoading(true);
+  window.TubeNoteExplainer.cancel();
   resultSection.classList.add("hidden");
   setStatus("Gemini가 영상을 분석하고 있습니다. 영상 길이에 따라 시간이 걸릴 수 있습니다.");
 
