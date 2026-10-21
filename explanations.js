@@ -213,7 +213,7 @@
     body.setAttribute("aria-busy", "true");
     const requestController = new AbortController();
     controller = requestController;
-    const timeout = setTimeout(() => requestController.abort(), 60000);
+    const timeout = setTimeout(() => requestController.abort(), 100000);
     try {
       const response = await fetch("/api/explain", {
         method: "POST",

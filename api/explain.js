@@ -33,7 +33,7 @@ const instruction = [
   "comparison: 혼동하기 쉬운 관련 개념 또는 합리적인 대조 상황 2개를 left/right에 놓고 공통점 shared, 같은 기준으로 비교한 rows 3~5개, 언제 구별해 적용할지 takeaway를 작성하세요. 동일한 대상을 이름만 바꿔 비교하지 마세요.",
   "각 방식이 적합하면 available=true, reason은 빈 문자열입니다. 억지 비유·부정확한 비교가 필요하거나 근거가 부족하면 available=false와 이유를 쓰고 나머지 문자열은 빈 값, 배열은 빈 배열로 반환하세요.",
   "가장 이해에 도움이 되는 사용 가능한 방식 하나를 recommended_mode로 선택하고 recommendation_reason을 한 문장으로 쓰세요.",
-  "전체를 약 1500~2300자 이내로 간결하게 작성하세요. 코드나 HTML, 마크다운 없이 JSON 스키마만 반환하세요."
+  "전체를 약 1000~1600자 이내로 간결하게 작성하세요. 코드나 HTML, 마크다운 없이 JSON 스키마만 반환하세요."
 ].join("\n");
 
 module.exports = async function handler(req, res) {
@@ -81,7 +81,7 @@ module.exports = async function handler(req, res) {
   cache.delete(key);
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 50000);
+  const timeout = setTimeout(() => controller.abort(), 90000);
   try {
     const response = await fetch(GEMINI_ENDPOINT, {
       method: "POST",
@@ -91,6 +91,7 @@ module.exports = async function handler(req, res) {
         system_instruction: instruction,
         input: [{ type: "text", text: JSON.stringify(context) }],
         response_format: { type: "text", mime_type: "application/json", schema: responseSchema },
+        generation_config: { thinking_level: "low", max_output_tokens: 6000 },
         store: false
       }),
       signal: controller.signal
